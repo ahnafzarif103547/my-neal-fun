@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>মেমরি গেম</title>
+    <link rel="stylesheet" href="../style.css" />
+    <style>
+        #numberBox {
+            font-size: 5rem;
+            font-weight: 800;
+            background: white;
+            padding: 35px;
+            border-radius: 24px;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px auto;
+            max-width: 250px;
+            transition: all 0.3s;
+            color: #0f172a;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        #numberBox.hidden {
+            filter: blur(25px);
+            color: #94a3b8;
+            user-select: none;
+        }
+        .memory-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-group button {
+            min-width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 মেমরি গেম</h1>
+        <p style="color:#64748b;">সংখ্যাটি দেখো, মনে রাখো, এবং বলো!</p>
+        
+        <div class="game-area">
+            <div id="numberBox">??</div>
+            
+            <div class="memory-stats">
+                <span>⭐ স্কোর: <strong id="memoryScore">০</strong></span>
+                <span>🎯 সঠিক: <strong id="correctCount">০</strong></span>
+                <span>❌ ভুল: <strong id="wrongCount">০</strong></span>
+            </div>
+            
+            <div class="btn-group">
+                <button id="showBtn">👁️ দেখাও</button>
+                <button id="checkBtn">✅ মনে আছে?</button>
+                <button class="secondary" id="resetMemBtn">🔄 রিসেট</button>
+            </div>
+        </div>
+        
+        <a href="../index.html" class="back-link">← হোমপেজে ফিরে যান</a>
+    </div>
+    
+    <script>
+        let currentNumber = 0;
+        let score = 0;
+        let correct = 0;
+        let wrong = 0;
+        let isShowing = false;
+        let timeoutId = null;
+        
+        const numberBox = document.getElementById('numberBox');
+        const showBtn = document.getElementById('showBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const resetBtn = document.getElementById('resetMemBtn');
+        const scoreSpan = document.getElementById('memoryScore');
+        const correctSpan = document.getElementById('correctCount');
+        const wrongSpan = document.getElementById('wrongCount');
+
+        function generateNumber() {
+            currentNumber = Math.floor(Math.random() * 100);
+            numberBox.textContent = currentNumber;
+            numberBox.classList.add('hidden');
+            isShowing = false;
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+        }
+
+        function showNumber() {
+            if (isShowing) return;
+            numberBox.classList.remove('hidden');
+            isShowing = true;
+            
+            timeoutId = setTimeout(() => {
+                numberBox.classList.add('hidden');
+                isShowing = false;
+                timeoutId = null;
+            }, 1500);
+        }
+
+        function checkMemory() {
+            if (isShowing) {
+                alert('⏳ এখনো সংখ্যাটি দেখাচ্ছে! মনে রাখার চেষ্টা করো...');
+                return;
+            }
+            
+            const userGuess = prompt('🔢 সংখ্যাটি কী ছিল? (০-৯৯)');
+            if (userGuess === null) return;
+            
+            const guess = parseInt(userGuess);
+            if (isNaN(guess)) {
+                alert('⚠️ দয়া করে একটি সংখ্যা দিন!');
+                return;
+            }
+            
+            if (guess === currentNumber) {
+                score++;
+                correct++;
+                alert('✅ দারুণ! সঠিক উত্তর! +১ পয়েন্ট');
+            } else {
+                wrong++;
+                alert(`❓ ভুল! সংখ্যাটি ছিল ${currentNumber}`);
+            }
+            
+            scoreSpan.textContent = score;
+            correctSpan.textContent = correct;
+            wrongSpan.textContent = wrong;
+            generateNumber();
+        }
+
+        function resetGame() {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+            score = 0;
+            correct = 0;
+            wrong = 0;
+            scoreSpan.textContent = score;
+            correctSpan.textContent = correct;
+            wrongSpan.textContent = wrong;
+            generateNumber();
+        }
+
+        // ইভেন্ট লিসেনার
+        showBtn.addEventListener('click', showNumber);
+        checkBtn.addEventListener('click', checkMemory);
+        resetBtn.addEventListener('click', resetGame);
+
+        // শুরু
+        generateNumber();
+    </script>
+</body>
+</html>
